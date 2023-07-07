@@ -30,6 +30,8 @@ const Role = sequelize.define(
 const File = sequelize.define('file', {
     id: { type: DataTypes.INTEGER, autoIncrement: true, primaryKey: true },
     name: { type: DataTypes.STRING },
+    real_path: { type: DataTypes.STRING },
+    real_filename: { type: DataTypes.STRING },
     deleted: { type: DataTypes.INTEGER, allowNull: false, defaultValue: 0 },
     reserved: { type: DataTypes.BOOLEAN, allowNull: false, defaultValue: false },
     version: { type: DataTypes.INTEGER },
@@ -48,7 +50,9 @@ UserType.hasMany(User);
 User.belongsTo(UserType);
 
 Role.hasMany(User);
-User.belongsTo(Role);
+User.belongsTo(Role, {
+    as: 'role',
+});
 
 FileType.hasMany(File);
 File.belongsTo(FileType);

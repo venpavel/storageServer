@@ -3,14 +3,18 @@ const fileController = require('../controllers/fileController');
 
 const fileRouter = Router();
 
-fileRouter.get('/:id', fileController.getFile);
-fileRouter.get('/:id/info', fileController.getFileInfo);
-fileRouter.get('/:id/:ver', fileController.getFileVersion);
-fileRouter.get('/:id/:ver/info', fileController.getFileVersionInfo);
 fileRouter.post('/', fileController.uploadFile);
-fileRouter.patch('/', fileController.changeFileInfo);
-fileRouter.put('/', fileController.addFileVersion);
+fileRouter.get('/:id', fileController.getFile);
+fileRouter.patch('/:id', fileController.changeFileInfo);
 fileRouter.delete('/:id', fileController.removeFile);
-fileRouter.delete('/:id/:ver', fileController.removeFileVersion);
+fileRouter.get('/:id/info', fileController.getFileInfo);
+fileRouter.post('/:id/versions', fileController.addFileVersion);
+fileRouter.get('/:id/versions/:ver', fileController.getFileVersion);
+fileRouter.get('/:id/versions/:ver/info', fileController.getFileVersionInfo);
+fileRouter.delete('/:id/versions/:ver', fileController.removeFileVersion);
+
+fileRouter.post('/contents', fileController.createFolder);
+fileRouter.get('/contents/:id', fileController.getFolderContent);
+fileRouter.get('/contents/:id/info', fileController.getFolderInfo);
 
 module.exports = fileRouter;

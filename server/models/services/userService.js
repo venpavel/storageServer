@@ -1,7 +1,7 @@
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 
-const { User, Role, UserType } = require('../models');
+const { Repo } = require('./repositories');
 const {
     APP_STORAGE_SECRET_KEY: secret,
     APP_STORAGE_USER_ROLE_NAME: USER_ROLE_NAME,
@@ -9,8 +9,14 @@ const {
 } = require('../../config');
 
 class UserService {
+    userRepo;
+
+    constructor(repo) {
+        this.userRepo = repo;
+    }
+
     async login({ email, password }) {
-        const dbuser = await User.findOne({ where: { email: email }, include: Role });
+        const dbuser = await this.userRepo.findOne_('User', { email }, ['role']);
         if (!dbuser) throw new Error('Не найден пользователь в БД с таким email');
 
         const validUser = await bcrypt.compare(password, dbuser.password);
@@ -36,15 +42,15 @@ class UserService {
     }
 
     async createUser({ firstName, lastName, email, password, role = USER_ROLE_NAME }) {
-        const dbRole = await Role.findOne({ where: { name: role } });
-        const userTypeId = await UserType.findOne({ where: { name: USER_TYPE_NAME } });
+        const dbRole = await this.userRepo.findOne_('Role', { name: role });
+        const userTypeId = await this.userRepo.findOne_('UserType', { name: USER_TYPE_NAME });
 
         if (!dbRole || !userTypeId) {
             throw new Error('Ошибка поиска ролей в БД!');
         }
 
         const hashPassword = await bcrypt.hash(password, 8);
-        const user = await User.create({
+        const user = await this.userRepo.create_('User', {
             name: firstName,
             lastname: lastName,
             email,
@@ -64,14 +70,15 @@ class UserService {
         password: newPassword,
         role: newRole,
     }) {
-        const oldUser = await User.findOne({ where: { id }, include: Role });
+        //const oldUser = await User.findOne_({ where: { id }, include: { association: 'role' } });
+        const oldUser = await this.userRepo.findOne_('User', { id }, ['role']);
         if (!oldUser) {
             throw new Error('Ошибка, не найден пользователь!');
         }
 
         let newRoleId;
         if (newRole) {
-            const dbRole = await Role.findOne({ where: { name: newRole } });
+            const dbRole = await this.userRepo.findOne_('Role', { name: newRole });
             if (!dbRole) {
                 throw new Error('Ошибка поиска ролей в БД!');
             }
@@ -81,8 +88,8 @@ class UserService {
         }
 
         const newPasswordHash = newPassword ? await bcrypt.hash(newPassword, 8) : oldUser.password;
-
-        const user = await User.update(
+        const user = await this.userRepo.update_(
+            'User',
             {
                 name: newFirstName,
                 lastname: newLastName,
@@ -90,15 +97,15 @@ class UserService {
                 password: newPasswordHash,
                 roleId: newRoleId,
             },
-            { where: { id } }
+            { id }
         );
         return user;
     }
 
     async getAllUsers() {
-        const users = await User.findAll();
+        const users = await this.userRepo.findAll_('User');
         return users;
     }
 }
 
-module.exports = new UserService();
+module.exports = new UserService(new Repo());
