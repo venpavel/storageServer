@@ -3,9 +3,9 @@ const jwt = require('jsonwebtoken');
 
 const { Repo } = require('./repositories');
 const {
-    APP_STORAGE_SECRET_KEY: secret,
-    APP_STORAGE_USER_ROLE_NAME: USER_ROLE_NAME,
-    APP_STORAGE_USER_TYPE_NAME: USER_TYPE_NAME,
+    APP_SECRET_KEY: secret,
+    APP_USER_ROLE_NAME: USER_ROLE_NAME,
+    APP_USER_TYPE_NAME: USER_TYPE_NAME,
 } = require('../../config');
 
 class UserService {
@@ -22,20 +22,20 @@ class UserService {
         const validUser = await bcrypt.compare(password, dbuser.password);
         if (!validUser) throw new Error('Указан неверный пароль!');
 
-        const tokenstring = { name: dbuser.name, email, role: dbuser.role.name };
+        const tokenstring = { id: dbuser.id, name: dbuser.name, email, role: dbuser.role.name };
         const token = jwt.sign(tokenstring, secret, { expiresIn: '10h' });
 
         return { token: token };
     }
 
-    async check(name, email, role) {
-        const token = jwt.sign({ name, email, role }, secret, { expiresIn: '10h' });
+    async check(id, name, email, role) {
+        const token = jwt.sign({ id, name, email, role }, secret, { expiresIn: '10h' });
         return { token };
     }
 
     async registration({ firstName, lastName, email, password }) {
         const user = await this.createUser({ firstName, lastName, email, password });
-        const tokenstring = { name: user.name, email, role: user.role };
+        const tokenstring = { id: user.id, name: user.name, email, role: user.role };
         const token = jwt.sign(tokenstring, secret, { expiresIn: '10h' });
 
         return { token: token };

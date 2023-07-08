@@ -27,6 +27,7 @@ readme.txt
 /server/.env.test.local
 /server/.env.production.local
 /server/storage/*
+/server/tmp/*
 
 /server/npm-debug.log*
 /server/yarn-debug.log*

@@ -1,4 +1,14 @@
+const path = require('path');
+const fse = require('fs-extra');
+
+const ApiError = require('../../error/ApiError');
 const { Repo } = require('./repositories');
+const {
+    APP_UPLOADS_FOLDER,
+    APP_STORAGE_ROOT_FOLDER,
+    APP_FILE_TYPE_NAME,
+    APP_FOLDER_TYPE_NAME,
+} = require('../../config');
 
 class FileService {
     fileRepo;
@@ -7,34 +17,94 @@ class FileService {
         this.fileRepo = repo;
     }
 
-    async uploadFile(file) {
-        const result = `uploadFile id=${file}`;
-        return result;
+    async uploadFile(file, { version = 1, parent_id, name, creator }) {
+        const fileTypeId = await this.fileRepo.findOne_('FileType', { name: APP_FILE_TYPE_NAME });
+        if (!fileTypeId) {
+            throw ApiError.internalError('Ошибка поиска типа файл/папка в БД!');
+        }
+        //TODO: создать механизм размещения файла в подкаталоги и parent_id
+        const storageFolder = APP_STORAGE_ROOT_FOLDER;
+
+        const fileRecord = await this.fileRepo.create_('File', {
+            name: name || file.originalname,
+            version: version || 1,
+            createdById: creator,
+            modifiedById: creator,
+            fileTypeId: fileTypeId.id,
+            real_path: storageFolder,
+            real_filename: file.filename,
+        });
+        if (!fileRecord) {
+            throw ApiError.internalError('Ошибка создания записи для файла в БД!');
+        }
+
+        const src_filepath = path.resolve(file.destination, file.filename);
+        const dest_filepath = path.resolve(storageFolder, file.filename);
+        await fse.move(src_filepath, dest_filepath);
+
+        return fileRecord;
     }
 
     async getFile(id) {
-        const file = await this.fileRepo.findOne_('File', { id }, ['creator', 'editor']);
+        const file = await this.fileRepo.findOne_('File', { id, deleted: 0 });
         if (!file) {
             throw new Error('Файл не найден!');
         }
-        return file;
+        const fullpath = path.resolve(file.real_path, file.real_filename);
+        const fileExist = await fse.pathExists(fullpath);
+        if (!fileExist) {
+            throw ApiError.internalError('Файл не найден в репозитории!');
+        }
+
+        const fileObj = { fullpath, name: encodeURIComponent(file.name) };
+        return fileObj;
     }
 
-    async changeFileInfo(file) {
-        const result = `changeFileInfo id=${file}`;
-        return result;
+    async changeFileInfo({ id, name, editor }) {
+        const file = await this.fileRepo.findOne_('File', { id, deleted: 0 });
+        if (!file) {
+            throw new Error('Файл не найден!');
+        }
+        console.log('editor = ', editor);
+        const newFile = await this.fileRepo.update_(
+            'File',
+            {
+                id,
+                name: name || file.name,
+                modifiedById: editor || file.modifiedById,
+            },
+            { id }
+        );
+        return newFile;
     }
 
     async removeFile(id) {
-        const result = `removeFile id=${id}`;
-        return result;
-    }
-
-    async getFileInfo(id) {
-        const file = await this.fileRepo.findOne_('File', { id }, ['creator', 'editor']);
+        const file = await this.fileRepo.findOne_('File', { id, deleted: 0 });
         if (!file) {
             throw new Error('Файл не найден!');
         }
+        const fullpath = path.resolve(file.real_path, file.real_filename);
+        const fileExist = await fse.pathExists(fullpath);
+        if (!fileExist) {
+            throw ApiError.internalError('Файл не найден в репозитории!');
+        }
+
+        const paranoid = await this.fileRepo.update_('File', { deleted: 1 }, { id });
+        const removed = await fse.remove(fullpath);
+
+        console.log('removed = ', removed);
+        return { message: 'OK' };
+    }
+
+    async getFileInfo(id) {
+        const file = await this.fileRepo.findOne_('File', { id, deleted: 0 }, [
+            'creator',
+            'editor',
+        ]);
+        if (!file) {
+            throw new Error('Файл не найден!');
+        }
+        // TODO: убрать из выдачи поля real_
         return file;
     }
 

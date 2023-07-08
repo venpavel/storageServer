@@ -1,13 +1,27 @@
 const { Router } = require('express');
+
 const fileController = require('../controllers/fileController');
+const fileMiddleware = require('../middleware/fileMiddleware');
+const checkRoleMiddleware = require('../middleware/checkRoleMiddleware');
+const { APP_ADMIN_ROLE_NAME, APP_POWERUSER_ROLE_NAME } = require('../config');
 
 const fileRouter = Router();
 
-fileRouter.post('/', fileController.uploadFile);
+fileRouter.post(
+    '/',
+    [checkRoleMiddleware([APP_ADMIN_ROLE_NAME, APP_POWERUSER_ROLE_NAME]), fileMiddleware],
+    fileController.uploadFile
+);
 fileRouter.get('/:id', fileController.getFile);
-fileRouter.patch('/:id', fileController.changeFileInfo);
+fileRouter.patch(
+    '/:id',
+    checkRoleMiddleware([APP_ADMIN_ROLE_NAME, APP_POWERUSER_ROLE_NAME]),
+    fileController.changeFileInfo
+);
 fileRouter.delete('/:id', fileController.removeFile);
 fileRouter.get('/:id/info', fileController.getFileInfo);
+
+// TODO: all below
 fileRouter.post('/:id/versions', fileController.addFileVersion);
 fileRouter.get('/:id/versions/:ver', fileController.getFileVersion);
 fileRouter.get('/:id/versions/:ver/info', fileController.getFileVersionInfo);

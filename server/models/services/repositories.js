@@ -7,7 +7,7 @@ const MongodbRepo = require('./MongodbRepo');
 let Repo;
 
 // TODO: возможно разделение на User и FileRepo
-switch (process.env.APP_STORAGE_DB_DIALECT) {
+switch (process.env.APP_DB_DIALECT) {
     case 'postgres':
         Repo = PostgresRepo;
         break;

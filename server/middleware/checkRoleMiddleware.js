@@ -1,5 +1,5 @@
 const jwt = require('jsonwebtoken');
-const { APP_STORAGE_SECRET_KEY } = require('../config');
+const { APP_SECRET_KEY } = require('../config');
 const ApiError = require('../error/ApiError');
 
 module.exports = (role = []) => {
@@ -12,7 +12,7 @@ module.exports = (role = []) => {
             if (!token) {
                 return next(ApiError.notAuthorized('Вы не авторизованы!'));
             }
-            const decoded = jwt.verify(token, APP_STORAGE_SECRET_KEY);
+            const decoded = jwt.verify(token, APP_SECRET_KEY);
             if (!role.includes(decoded.role)) {
                 return next(ApiError.accessForbidden('Нет доступа!'));
             }

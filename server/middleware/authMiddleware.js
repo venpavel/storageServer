@@ -1,5 +1,5 @@
 const jwt = require('jsonwebtoken');
-const { APP_STORAGE_SECRET_KEY } = require('../config');
+const { APP_SECRET_KEY } = require('../config');
 const ApiError = require('../error/ApiError');
 
 module.exports = (req, res, next) => {
@@ -11,7 +11,7 @@ module.exports = (req, res, next) => {
         if (!token) {
             return next(ApiError.notAuthorized('Вы не авторизованы!'));
         }
-        const decoded = jwt.verify(token, APP_STORAGE_SECRET_KEY);
+        const decoded = jwt.verify(token, APP_SECRET_KEY);
         req.user = decoded;
         next();
     } catch (e) {

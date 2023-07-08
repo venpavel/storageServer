@@ -64,7 +64,12 @@ class UserController {
 
     async check(req, res) {
         try {
-            const result = await userService.check(req.user.name, req.user.email, req.user.role);
+            const result = await userService.check(
+                req.user.id,
+                req.user.name,
+                req.user.email,
+                req.user.role
+            );
             res.json(result);
         } catch (e) {
             console.log(e);
