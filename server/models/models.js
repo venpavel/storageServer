@@ -5,7 +5,7 @@ const User = sequelize.define('user', {
     id: { type: DataTypes.INTEGER, autoIncrement: true, primaryKey: true },
     name: { type: DataTypes.STRING },
     lastname: { type: DataTypes.STRING },
-    email: { type: DataTypes.STRING, allowNull: false, unique: true },
+    email: { type: DataTypes.STRING, allowNull: false },
     password: { type: DataTypes.STRING },
 });
 
@@ -46,16 +46,16 @@ const FileType = sequelize.define(
     { timestamps: false }
 );
 
-UserType.hasMany(User);
-User.belongsTo(UserType);
+UserType.hasMany(User, { foreignKey: 'userTypeId' });
+User.belongsTo(UserType, { as: 'UserType', foreignKey: 'userTypeId' });
 
 Role.hasMany(User);
 User.belongsTo(Role, {
     as: 'role',
 });
 
-FileType.hasMany(File);
-File.belongsTo(FileType);
+FileType.hasMany(File, { foreignKey: 'fileTypeId' });
+File.belongsTo(FileType, { as: 'FileType', foreignKey: 'fileTypeId' });
 
 User.hasMany(File, {
     onDelete: 'no action',

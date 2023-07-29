@@ -78,6 +78,7 @@ class FileService {
         return newFile;
     }
 
+    // TODO: Удаление с диска продумать
     async removeFile(id) {
         const file = await this.fileRepo.findOne_('File', { id, deleted: 0 });
         if (!file) {
@@ -133,8 +134,15 @@ class FileService {
         return result;
     }
 
-    async getFolderContent(id) {
-        const result = `getFolderContent id=${id}`;
+    //TODO: parent_id use
+    async getFolderContent(id, offset, limit) {
+        const result = await this.fileRepo.findAll_(
+            'File',
+            { deleted: 0 },
+            ['creator', 'editor', 'FileType'],
+            offset,
+            limit
+        );
         return result;
     }
 

@@ -1,0 +1,17 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+.App {
+
+}
+
+.active .page-link{
+    background: #999;
+    border-color: #999;
+}
+.page-link {
+    color: black;
+}

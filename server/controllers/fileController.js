@@ -158,11 +158,12 @@ class FileController {
 
     async getFolderContent(req, res, next) {
         try {
+            const { offset, limit } = req.query;
             const id = req.params.id;
             if (!id) {
                 return next(ApiError.badClientRequest('Не указан id папки!'));
             }
-            const result = await fileService.getFolderContent(id);
+            const result = await fileService.getFolderContent(id, offset, limit);
             res.json(result);
         } catch (e) {
             console.log(e);

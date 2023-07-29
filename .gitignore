@@ -5,9 +5,10 @@ readme.txt
 # misc
 .DS_Store
 /prj
-
+/.idea/*
 /client/.DS_Store
 /client/node_modules
+/client/.idea
 /client/.pnp
 /client/.pnp.js
 /client/.env.local

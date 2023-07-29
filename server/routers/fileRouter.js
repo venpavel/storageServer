@@ -18,7 +18,11 @@ fileRouter.patch(
     checkRoleMiddleware([APP_ADMIN_ROLE_NAME, APP_POWERUSER_ROLE_NAME]),
     fileController.changeFileInfo
 );
-fileRouter.delete('/:id', fileController.removeFile);
+fileRouter.delete(
+    '/:id',
+    checkRoleMiddleware([APP_ADMIN_ROLE_NAME, APP_POWERUSER_ROLE_NAME]),
+    fileController.removeFile
+);
 fileRouter.get('/:id/info', fileController.getFileInfo);
 
 // TODO: all below
@@ -28,7 +32,11 @@ fileRouter.get('/:id/versions/:ver/info', fileController.getFileVersionInfo);
 fileRouter.delete('/:id/versions/:ver', fileController.removeFileVersion);
 
 fileRouter.post('/contents', fileController.createFolder);
-fileRouter.get('/contents/:id', fileController.getFolderContent);
+fileRouter.get(
+    '/contents/:id',
+    checkRoleMiddleware([APP_ADMIN_ROLE_NAME, APP_POWERUSER_ROLE_NAME]),
+    fileController.getFolderContent
+);
 fileRouter.get('/contents/:id/info', fileController.getFolderInfo);
 
 module.exports = fileRouter;

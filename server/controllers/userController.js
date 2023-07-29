@@ -101,6 +101,29 @@ class UserController {
         }
     }
 
+    /*  result format:
+        [
+            {
+                "id": 3,
+                "name": "Иван",
+                "lastname": "Иванов",
+                "email": "ivan@ivan.i",
+                "password": "*****",
+                "createdAt": "2023-07-05T15:40:09.818Z",
+                "updatedAt": "2023-07-07T16:56:37.150Z",
+                "userTypeId": 1,
+                "roleId": 2,
+                "role": {
+                    "id": 2,
+                    "name": "USER"
+                },
+                "UserType": {
+                    "id": 1,
+                    "name": "User"
+                }
+            },
+        ]
+    */
     async getAllUsers(req, res, next) {
         try {
             const users = await userService.getAllUsers();

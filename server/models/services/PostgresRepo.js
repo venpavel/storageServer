@@ -49,9 +49,20 @@ module.exports = class PostgresRepo {
         return changedEntity;
     }
 
-    async findAll_(modelName) {
+    async findAll_(modelName, conditions = {}, includes = [], offset = null, limit = null) {
+        let allConditions = {};
+        if (Object.keys(conditions).length) {
+            allConditions = { where: { ...conditions } };
+        }
+        if (includes.length) {
+            allConditions.include = includes.map((include) => ({ association: include }));
+        }
+        allConditions.offset = offset;
+        allConditions.limit = limit;
+        //console.log('allconditions:', allConditions);
+
         const repoModel = this.chooseModel(modelName);
-        const entities = await repoModel.findAll();
+        const entities = await repoModel.findAndCountAll(allConditions);
         return entities;
     }
 };

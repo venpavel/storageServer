@@ -23,6 +23,7 @@ class UserService {
         if (!validUser) throw new Error('Указан неверный пароль!');
 
         const tokenstring = { id: dbuser.id, name: dbuser.name, email, role: dbuser.role.name };
+        // TODO: Время жизни токена
         const token = jwt.sign(tokenstring, secret, { expiresIn: '10h' });
 
         return { token: token };
@@ -103,7 +104,7 @@ class UserService {
     }
 
     async getAllUsers() {
-        const users = await this.userRepo.findAll_('User');
+        const users = await this.userRepo.findAll_('User', {}, ['role', 'UserType']);
         return users;
     }
 }
