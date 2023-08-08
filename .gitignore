@@ -28,6 +28,7 @@ readme.txt
 /server/.env.test.local
 /server/.env.production.local
 /server/storage/*
+/server/dist/*
 /server/tmp/*
 
 /server/npm-debug.log*

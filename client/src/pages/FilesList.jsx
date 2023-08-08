@@ -5,7 +5,7 @@ import {useNavigate} from "react-router-dom";
 import {getFolderContent, openFile, removeFile} from "../API/fileAPI";
 import FileListItem from "../components/FileListItem";
 import ToastBottomInfo from "../components/ToastBottomInfo";
-import {useFiling} from "../hooks/useFiling";
+import {useRequest} from "../hooks/useRequest";
 import {getPageCount} from "../utils/commonMethods";
 import PaginationST from "../components/PaginationST";
 import FileListFilter from "../components/FileListFilter";
@@ -28,7 +28,7 @@ const FilesList = () => {
         fetchFiles(page, limit);
     }, []);
 
-    const [fetchFiles, filesLoading, fetchFilesError, setFetchFilesError] = useFiling(async (page, limit) => {
+    const [fetchFiles, filesLoading, fetchFilesError, setFetchFilesError] = useRequest(async (page, limit) => {
         const offset = page * limit - limit;
         const data = await getFolderContent(3, offset, limit);
         console.log('Общее кол-во файлов: ', data.count);
@@ -38,14 +38,14 @@ const FilesList = () => {
 
     const sortedAndFilteredFiles = useFiles(files, filter.sortBy, filter.query);
 
-    const [removeFileH, remButtonsDisabled, remFileError, setRemFileError] = useFiling(async (id) => {
+    const [removeFileH, remButtonsDisabled, remFileError, setRemFileError] = useRequest(async (id) => {
         await removeFile(id);
         setToastTitle('Документ успешно удален!');
         setShowToast(true);
         setFiles([...files.filter(file => file.id !== id)])
     });
 
-    const [openFileH, opnButtonsDisabled, opnFileError, setOpnFileError] = useFiling(async (id, name) => {
+    const [openFileH, opnButtonsDisabled, opnFileError, setOpnFileError] = useRequest(async (id, name) => {
         await openFile(id, name);
         setToastTitle('Документ успешно открыт!');
         setShowToast(true);

@@ -6,7 +6,7 @@ import {getFileInfo, openFile, removeFile} from "../API/fileAPI";
 import FileListItem from "../components/FileListItem";
 import FileInfoCard from "../components/FileInfoCard";
 import ToastBottomInfo from "../components/ToastBottomInfo";
-import {useFiling} from "../hooks/useFiling";
+import {useRequest} from "../hooks/useRequest";
 
 const FileInfo = () => {
     const {id} = useParams();
@@ -25,7 +25,7 @@ const FileInfo = () => {
             .catch(e => console.log(e));
     }, []);
 
-    const [removeFileH, remButtonsDisabled, remFileError, setRemFileError] = useFiling(async (id) => {
+    const [removeFileH, remButtonsDisabled, remFileError, setRemFileError] = useRequest(async (id) => {
         await removeFile(id);
         setToastTitle('Документ успешно удален!');
         setShowToast(true);
@@ -35,7 +35,7 @@ const FileInfo = () => {
             , 2000);
     });
 
-    const [openFileH, opnButtonsDisabled, opnFileError, setOpnFileError] = useFiling(async (id, name) => {
+    const [openFileH, opnButtonsDisabled, opnFileError, setOpnFileError] = useRequest(async (id, name) => {
         await openFile(id, name);
         setToastTitle('Документ успешно открыт!');
         setShowToast(true);

@@ -4,11 +4,8 @@
   "description": "Simple archive file storage for external applications. Backend.",
   "main": "server.js",
   "scripts": {
-    "dev": "nodemon server.js",
-    "build": "webpack --config webpack.prod.js"
+    "start": "nodemon server.js"
   },
-  "private": "true",
-  "keywords": [],
   "author": "Pavel Vengrzhenovskiy",
   "license": "ISC",
   "dependencies": {
@@ -23,11 +20,5 @@
     "pg-hstore": "^2.3.4",
     "sequelize": "^6.32.1",
     "uuid": "^9.0.0"
-  },
-  "devDependencies": {
-    "copy-webpack-plugin": "^11.0.0",
-    "webpack": "^5.88.2",
-    "webpack-cli": "^5.1.4",
-    "webpack-node-externals": "^3.0.0"
   }
 }
