@@ -8,6 +8,8 @@ readme.txt
 /.idea/*
 /client/.DS_Store
 /client/node_modules
+/client/build/*
+/client/dist/*
 /client/.idea
 /client/.pnp
 /client/.pnp.js
@@ -29,6 +31,7 @@ readme.txt
 /server/.env.production.local
 /server/storage/*
 /server/dist/*
+/server/build/*
 /server/tmp/*
 
 /server/npm-debug.log*

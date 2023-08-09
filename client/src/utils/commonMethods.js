@@ -7,7 +7,7 @@ export const formatDate = (date_str, opts) => {
         ...opts
     };
 
-    const locale = process.env.REACT_APP_DEFAULT_LOCALE;
+    const locale = process.env.REACT_APP_DEFAULT_LOCALE; //'ru-RU' process.env.REACT_APP_DEFAULT_LOCALE ;
     return new Intl.DateTimeFormat(locale, options).format(new Date(date_str));
 }
 
