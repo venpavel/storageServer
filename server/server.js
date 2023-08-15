@@ -1,13 +1,12 @@
+require('dotenv').config();
 const express = require('express');
 const cors = require('cors');
-const dotenv = require('dotenv');
 const fse = require('fs-extra');
 
 const { APP_UPLOADS_FOLDER } = require('./config');
 const sequelize = require('./db_conn');
 const router = require('./routers/index');
 
-dotenv.config();
 const PORT = process.env.APP_SERVER_PORT || 8082;
 
 const app = express();

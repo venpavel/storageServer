@@ -1,6 +1,3 @@
-const dotenv = require('dotenv');
-dotenv.config();
-
 const PostgresRepo = require('./PostgresRepo');
 const MongodbRepo = require('./MongodbRepo');
 
