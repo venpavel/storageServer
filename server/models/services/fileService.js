@@ -48,7 +48,7 @@ class FileService {
     async getFile(id) {
         const file = await this.fileRepo.findOne_('File', { id, deleted: 0 });
         if (!file) {
-            throw new Error('Файл не найден!');
+            throw ApiError.internalError('Файл не найден!');
         }
         const fullpath = path.resolve(file.real_path, file.real_filename);
         const fileExist = await fse.pathExists(fullpath);
@@ -63,7 +63,7 @@ class FileService {
     async changeFileInfo({ id, name, editor }) {
         const file = await this.fileRepo.findOne_('File', { id, deleted: 0 });
         if (!file) {
-            throw new Error('Файл не найден!');
+            throw ApiError.internalError('Файл не найден!');
         }
         console.log('editor = ', editor);
         const newFile = await this.fileRepo.update_(
@@ -82,7 +82,7 @@ class FileService {
     async removeFile(id) {
         const file = await this.fileRepo.findOne_('File', { id, deleted: 0 });
         if (!file) {
-            throw new Error('Файл не найден!');
+            throw ApiError.internalError('Файл не найден!');
         }
         const fullpath = path.resolve(file.real_path, file.real_filename);
         const fileExist = await fse.pathExists(fullpath);
@@ -103,7 +103,7 @@ class FileService {
             'editor',
         ]);
         if (!file) {
-            throw new Error('Файл не найден!');
+            throw ApiError.internalError('Файл не найден!');
         }
         // TODO: убрать из выдачи поля real_
         return file;

@@ -1,5 +1,6 @@
 const fileService = require('../models/services/fileService');
 const ApiError = require('../error/ApiError');
+const { checkValidationErrors } = require('./utils.controllers');
 
 class FileController {
     async uploadFile(req, res, next) {
@@ -17,30 +18,26 @@ class FileController {
             const result = await fileService.uploadFile(file, filedata);
             res.json(result);
         } catch (e) {
-            console.log(e);
-            return next(ApiError.internalError({ message: e.message }));
+            next(e);
         }
     }
 
     async getFile(req, res, next) {
         try {
+            checkValidationErrors(req);
+
             const id = req.params.id;
-            if (!id) {
-                return next(ApiError.badClientRequest('Не указан id файла!'));
-            }
             const { fullpath, name } = await fileService.getFile(id);
             res.download(fullpath, name);
         } catch (e) {
-            console.log(e);
-            return next(ApiError.internalError({ message: e.message }));
+            next(e);
         }
     }
 
     async changeFileInfo(req, res, next) {
         try {
-            if (!req.params.id) {
-                return next(ApiError.badClientRequest('Не указан id  файла!'));
-            }
+            checkValidationErrors(req);
+
             const filedata = {
                 id: req.params.id,
                 name: req.body.name,
@@ -50,95 +47,82 @@ class FileController {
             const result = await fileService.changeFileInfo(filedata);
             res.json(result);
         } catch (e) {
-            console.log(e);
-            return next(ApiError.internalError({ message: e.message }));
+            next(e);
         }
     }
 
     async removeFile(req, res, next) {
         try {
+            checkValidationErrors(req);
+
             const id = req.params.id;
-            if (!id) {
-                return next(ApiError.badClientRequest('Не указан id  файла!'));
-            }
             const result = await fileService.removeFile(id);
             res.json(result);
         } catch (e) {
-            console.log(e);
-            return next(ApiError.internalError({ message: e.message }));
+            next(e);
         }
     }
 
     async getFileInfo(req, res, next) {
         try {
+            checkValidationErrors(req);
+
             const id = req.params.id;
-            if (!id) {
-                return next(ApiError.badClientRequest('Не указан id файла!'));
-            }
             const result = await fileService.getFileInfo(id);
             res.json(result);
         } catch (e) {
-            console.log(e);
-            return next(ApiError.internalError({ message: e.message }));
+            next(e);
         }
     }
 
     async addFileVersion(req, res, next) {
         try {
+            checkValidationErrors(req);
+
             const id = req.params.id;
-            if (!id) {
-                return next(ApiError.badClientRequest('Не указан id  файла!'));
-            }
             const result = await fileService.addFileVersion(id);
             res.json(result);
         } catch (e) {
-            console.log(e);
-            return next(ApiError.internalError({ message: e.message }));
+            next(e);
         }
     }
 
     async getFileVersion(req, res, next) {
         try {
+            checkValidationErrors(req);
+
             const id = req.params.id;
             const version = req.params.ver;
-            if (!id || !version) {
-                return next(ApiError.badClientRequest('Не указан id или версия файла!'));
-            }
             const result = await fileService.getFileVersion(id, version);
             res.json(result);
         } catch (e) {
-            console.log(e);
-            return next(ApiError.internalError({ message: e.message }));
+            next(e);
         }
     }
 
     async getFileVersionInfo(req, res, next) {
         try {
+            checkValidationErrors(req);
+
             const id = req.params.id;
             const version = req.params.ver;
-            if (!id || !version) {
-                return next(ApiError.badClientRequest('Не указан id или версия файла!'));
-            }
             const result = await fileService.getFileVersionInfo(id, version);
             res.json(result);
         } catch (e) {
-            console.log(e);
-            return next(ApiError.internalError({ message: e.message }));
+            next(e);
         }
     }
 
     async removeFileVersion(req, res, next) {
         try {
+            checkValidationErrors(req);
+
             const id = req.params.id;
             const version = req.params.ver;
-            if (!id || !version) {
-                return next(ApiError.badClientRequest('Не указан id или версия файла!'));
-            }
             const result = await fileService.removeFileVersion(id, version);
             res.json(result);
         } catch (e) {
-            console.log(e);
-            return next(ApiError.internalError({ message: e.message }));
+            next(e);
         }
     }
 
@@ -151,37 +135,32 @@ class FileController {
             const result = await fileService.createFolder(parent_id);
             res.json(result);
         } catch (e) {
-            console.log(e);
-            return next(ApiError.internalError({ message: e.message }));
+            next(e);
         }
     }
 
     async getFolderContent(req, res, next) {
         try {
+            checkValidationErrors(req);
+
             const { offset, limit } = req.query;
             const id = req.params.id;
-            if (!id) {
-                return next(ApiError.badClientRequest('Не указан id папки!'));
-            }
             const result = await fileService.getFolderContent(id, offset, limit);
             res.json(result);
         } catch (e) {
-            console.log(e);
-            return next(ApiError.internalError({ message: e.message }));
+            next(e);
         }
     }
 
     async getFolderInfo(req, res, next) {
         try {
+            checkValidationErrors(req);
+
             const id = req.params.id;
-            if (!id) {
-                return next(ApiError.badClientRequest('Не указан id папки!'));
-            }
             const result = await fileService.getFolderInfo(id);
             res.json(result);
         } catch (e) {
-            console.log(e);
-            return next(ApiError.internalError({ message: e.message }));
+            next(e);
         }
     }
 }

@@ -1,15 +1,14 @@
+const { validationResult } = require('express-validator');
 const userService = require('../models/services/userService');
 const ApiError = require('../error/ApiError');
+const { checkValidationErrors } = require('./utils.controllers');
 
 class UserController {
     async createUser(req, res, next) {
         try {
+            checkValidationErrors(req);
+
             const { firstName, lastName, email, password, role } = req.body;
-            // TODO: Заменить на проверку либо плагином либо общ.ф-ией?
-            // TODO:  role может отдельная функция
-            if (!firstName || !lastName || !password) {
-                return next(ApiError.badClientRequest('Введены не все данные!'));
-            }
             const user = await userService.createUser({
                 firstName,
                 lastName,
@@ -19,21 +18,18 @@ class UserController {
             });
             res.json(user);
         } catch (e) {
-            console.log(e);
-            return next(ApiError.internalError({ message: e.message }));
+            next(e);
         }
     }
 
     async registration(req, res, next) {
         try {
-            const { firstName, lastName, email, password } = req.body;
-            // TODO: Заменить на проверку либо плагином либо общ.ф-ией?
+            // TODO: Заменить на проверку formik \ yup??
             // TODO:  role может отдельная функция
-            if (!firstName || !lastName || !password) {
-                return next(
-                    ApiError.badClientRequest('Ошибка при регистраци. Введены не все данные!')
-                );
-            }
+            checkValidationErrors(req);
+            console.log('2--');
+            const { firstName, lastName, email, password } = req.body;
+
             const result = await userService.registration({
                 firstName,
                 lastName,
@@ -42,23 +38,18 @@ class UserController {
             });
             res.json(result);
         } catch (e) {
-            console.log(e);
-            return next(ApiError.internalError({ message: e.message }));
+            next(e);
         }
     }
 
     async login(req, res, next) {
         try {
+            checkValidationErrors(req);
             const { email, password } = req.body;
-            // TODO: также проверка
-            if (!email || !password) {
-                return next(ApiError.badClientRequest('Введите email и пароль!'));
-            }
             const result = await userService.login({ email, password });
             res.json(result);
         } catch (e) {
-            console.log(e);
-            return next(ApiError.internalError({ message: e.message }));
+            next(e);
         }
     }
 
@@ -72,19 +63,14 @@ class UserController {
             );
             res.json(result);
         } catch (e) {
-            console.log(e);
-            return next(ApiError.internalError({ message: e.message }));
+            next(e);
         }
     }
 
     async updateUser(req, res, next) {
         try {
+            checkValidationErrors(req);
             const { id, firstName, lastName, email, password, role } = req.body;
-            // TODO: Заменить на проверку либо плагином либо общ.ф-ией?
-            // TODO:  role может отдельная функция
-            if (!id) {
-                return next(ApiError.badClientRequest('Не выбран пользователь для изменения!'));
-            }
 
             const user = await userService.updateUser({
                 id,
@@ -96,8 +82,7 @@ class UserController {
             });
             res.json(user);
         } catch (e) {
-            console.log(e);
-            return next(ApiError.internalError({ message: e.message }));
+            next(e);
         }
     }
 
@@ -129,8 +114,7 @@ class UserController {
             const users = await userService.getAllUsers();
             res.json(users);
         } catch (e) {
-            console.log(e);
-            return next(ApiError.internalError({ message: e.message }));
+            next(e);
         }
     }
 }

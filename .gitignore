@@ -6,6 +6,7 @@ readme.txt
 .DS_Store
 /prj
 /.idea/*
+/.vscode/*
 /client/.DS_Store
 /client/node_modules
 /client/build/*

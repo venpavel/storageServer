@@ -6,6 +6,7 @@ const fse = require('fs-extra');
 const { APP_UPLOADS_FOLDER } = require('./config');
 const sequelize = require('./db_conn');
 const router = require('./routers/index');
+const errorMiddleware = require('./middleware/errorMiddleware');
 
 const PORT = process.env.APP_SERVER_PORT || 8082;
 
@@ -13,14 +14,8 @@ const app = express();
 
 app.use(cors());
 app.use(express.json());
-
 app.use('/api', router);
-
-// TODO: сделать обработку ошибок
-app.use((err, req, res, next) => {
-    console.error(err.stack);
-    res.status(err.status).send(err.message);
-});
+app.use(errorMiddleware);
 
 const appStart = async () => {
     try {

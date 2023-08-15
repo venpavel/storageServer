@@ -7,6 +7,7 @@ const {
     APP_USER_ROLE_NAME: USER_ROLE_NAME,
     APP_USER_TYPE_NAME: USER_TYPE_NAME,
 } = require('../../config');
+const ApiError = require('../../error/ApiError');
 
 class UserService {
     userRepo;
@@ -17,10 +18,10 @@ class UserService {
 
     async login({ email, password }) {
         const dbuser = await this.userRepo.findOne_('User', { email }, ['role']);
-        if (!dbuser) throw new Error('Не найден пользователь в БД с таким email');
+        if (!dbuser) throw ApiError.badClientRequest('Не найден пользователь в БД с таким email');
 
         const validUser = await bcrypt.compare(password, dbuser.password);
-        if (!validUser) throw new Error('Указан неверный пароль!');
+        if (!validUser) throw ApiError.badClientRequest('Указан неверный пароль!');
 
         const tokenstring = { id: dbuser.id, name: dbuser.name, email, role: dbuser.role.name };
         // TODO: Время жизни токена
@@ -47,7 +48,7 @@ class UserService {
         const userTypeId = await this.userRepo.findOne_('UserType', { name: USER_TYPE_NAME });
 
         if (!dbRole || !userTypeId) {
-            throw new Error('Ошибка поиска ролей в БД!');
+            throw ApiError.internalError('Ошибка поиска ролей в БД!');
         }
 
         const hashPassword = await bcrypt.hash(password, 8);
@@ -74,14 +75,14 @@ class UserService {
         //const oldUser = await User.findOne_({ where: { id }, include: { association: 'role' } });
         const oldUser = await this.userRepo.findOne_('User', { id }, ['role']);
         if (!oldUser) {
-            throw new Error('Ошибка, не найден пользователь!');
+            throw ApiError.internalError('Ошибка, не найден пользователь!');
         }
 
         let newRoleId;
         if (newRole) {
             const dbRole = await this.userRepo.findOne_('Role', { name: newRole });
             if (!dbRole) {
-                throw new Error('Ошибка поиска ролей в БД!');
+                throw ApiError.internalError('Ошибка поиска ролей в БД!');
             }
             newRoleId = dbRole.id;
         } else {
