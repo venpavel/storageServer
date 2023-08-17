@@ -1,9 +1,11 @@
 import jwt_decode from "jwt-decode";
-import {hostAPI, hostSecureAPI} from './rootAPI';
+import {hostAPI} from './rootAPI';
 
-const userApiRoutes = {
+export const userApiRoutes = {
     login: {method: 'post', path: 'users/login'},
+    logout: {method: 'post', path: 'users/logout'},
     auth: {method: 'post', path: 'users/auth'},
+    refresh: {method: 'get', path: 'users/refresh'}
 }
 
 export const login = async (email, password) => {
@@ -11,26 +13,32 @@ export const login = async (email, password) => {
         email,
         password
     });
-    const decoded = jwt_decode(data.token);
-    localStorage.setItem('storagefToken', data.token);
+    const decoded = jwt_decode(data.accessToken);
+    localStorage.setItem('accessToken', data.accessToken);
 
     // console.log('-----login func-----');
     // console.log(decoded);
-    // console.log('--- token----');
-    // console.log(data.token);
+    // console.log('--- accessToken----');
+    // console.log(data.accessToken);
     // console.log('-----login func end-----');
     return decoded;
 }
 
-export const check = async () => {
-    const {data} = await hostSecureAPI.post(userApiRoutes.auth.path);
-    const decoded = jwt_decode(data.token);
-    localStorage.setItem('storagefToken', data.token);
+export const logout = async () => {
+    const result = await hostAPI.post(userApiRoutes.logout.path);
+    return result;
+}
 
+export const check = async () => {
     // console.log('-----check func-----');
+
+    const {data} = await hostAPI.get(userApiRoutes.refresh.path);
+    const decoded = jwt_decode(data.accessToken);
+    localStorage.setItem('accessToken', data.accessToken);
+
     // console.log(decoded);
-    // console.log('--- token----');
-    // console.log(data.token);
+    // console.log('--- accessToken----');
+    // console.log(data.accessToken);
     // console.log('-----check func end-----');
     return decoded;
 }

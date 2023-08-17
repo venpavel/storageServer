@@ -3,15 +3,17 @@ import {Button, ButtonGroup, Container, Nav, Navbar} from "react-bootstrap";
 import {AppContext} from "../context";
 import {NavLink} from "react-router-dom";
 import {ABOUT_ROUTE, LOGIN_ROUTE, FILES_ROUTE} from '../config'
+import {logout} from '../API/userAPI';
 
 const NavbarSt = () => {
     const {user} = useContext(AppContext);
 
-    const logout = (e) => {
+    const handleLogout = async (e) => {
         e.preventDefault();
         user.setIsAuth(false);
         user.setCurrent({});
-        localStorage.removeItem('storagefToken');
+        localStorage.removeItem('accessToken');
+        const result = await logout();
     };
 
     return (
@@ -38,7 +40,7 @@ const NavbarSt = () => {
                         <ButtonGroup>
                             {/* TODO: Переход на страницу пользователя */}
                             <Button type="button" variant="outline-light" className="me-2" >{user.current?.name}</Button>
-                            <Button type="button" variant="outline-danger" className="me-2" onClick={logout}>Выйти</Button>
+                            <Button type="button" variant="outline-danger" className="me-2" onClick={handleLogout}>Выйти</Button>
                         </ButtonGroup>
                         :
                         <ButtonGroup>

@@ -1,4 +1,4 @@
-const { User, Role, UserType, File, FileType } = require('../models');
+const { User, Role, UserType, File, FileType, Token} = require('../models');
 
 module.exports = class PostgresRepo {
     chooseModel(name) {
@@ -18,6 +18,9 @@ module.exports = class PostgresRepo {
                 break;
             case 'FileType':
                 model = FileType;
+                break;
+            case 'Token':
+                model = Token;
                 break;
             default:
                 throw new Error('Не найдена запрашиваемая модель!');
@@ -47,6 +50,13 @@ module.exports = class PostgresRepo {
         const repoModel = this.chooseModel(modelName);
         const changedEntity = await repoModel.update({ ...dataObject }, allConditions);
         return changedEntity;
+    }
+
+    async delete_(modelName, conditions) {
+        const allConditions = { where: { ...conditions } };
+        const repoModel = this.chooseModel(modelName);
+        const deletedEntity = await repoModel.destroy(allConditions);
+        return deletedEntity;
     }
 
     async findAll_(modelName, conditions = {}, includes = [], offset = null, limit = null) {
