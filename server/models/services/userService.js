@@ -59,11 +59,6 @@ class UserService {
         return {...tokens, user: userData};
     }
 
-    // async check(id, name, email, role) {
-    //     const token = jwt.sign({id, name, email, role}, process.env.APP_JWT_ACCESS_SECRET, {expiresIn: '10h'});
-    //     return {token};
-    // }
-
     async registration({firstName, lastName, email, password}) {
         const candidate = await this.userRepo.findOne_('User', {email});
         if (candidate) {

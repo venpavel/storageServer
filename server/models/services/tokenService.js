@@ -11,7 +11,7 @@ class TokenService {
 
     generateTokens(userData) {
         // TODO: Время жизни токена
-        const accessToken = jwt.sign(userData, process.env.APP_JWT_ACCESS_SECRET, { expiresIn: '30s' });
+        const accessToken = jwt.sign(userData, process.env.APP_JWT_ACCESS_SECRET, { expiresIn: '15m' });
         const refreshToken = jwt.sign(userData, process.env.APP_JWT_REFRESH_SECRET, { expiresIn: '12h' });
 
         return { accessToken, refreshToken };

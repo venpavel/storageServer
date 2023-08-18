@@ -2,13 +2,14 @@ const path = require('path');
 const fse = require('fs-extra');
 
 const ApiError = require('../../error/ApiError');
-const { Repo } = require('./repositories');
+const {Repo} = require('./repositories');
 const {
     APP_UPLOADS_FOLDER,
     APP_STORAGE_ROOT_FOLDER,
     APP_FILE_TYPE_NAME,
     APP_FOLDER_TYPE_NAME,
 } = require('../../config');
+const FileDto = require('../../dto/file.dto');
 
 class FileService {
     fileRepo;
@@ -17,8 +18,8 @@ class FileService {
         this.fileRepo = repo;
     }
 
-    async uploadFile(file, { version = 1, parent_id, name, creator }) {
-        const fileTypeId = await this.fileRepo.findOne_('FileType', { name: APP_FILE_TYPE_NAME });
+    async uploadFile(file, {version = 1, parent_id, name, creator}) {
+        const fileTypeId = await this.fileRepo.findOne_('FileType', {name: APP_FILE_TYPE_NAME});
         if (!fileTypeId) {
             throw ApiError.internalError('Ошибка поиска типа файл/папка в БД!');
         }
@@ -46,7 +47,7 @@ class FileService {
     }
 
     async getFile(id) {
-        const file = await this.fileRepo.findOne_('File', { id, deleted: 0 });
+        const file = await this.fileRepo.findOne_('File', {id, deleted: 0});
         if (!file) {
             throw ApiError.internalError('Файл не найден!');
         }
@@ -56,12 +57,12 @@ class FileService {
             throw ApiError.internalError('Файл не найден в репозитории!');
         }
 
-        const fileObj = { fullpath, name: encodeURIComponent(file.name) };
+        const fileObj = {fullpath, name: encodeURIComponent(file.name)};
         return fileObj;
     }
 
-    async changeFileInfo({ id, name, editor }) {
-        const file = await this.fileRepo.findOne_('File', { id, deleted: 0 });
+    async changeFileInfo({id, name, editor}) {
+        const file = await this.fileRepo.findOne_('File', {id, deleted: 0});
         if (!file) {
             throw ApiError.internalError('Файл не найден!');
         }
@@ -73,14 +74,15 @@ class FileService {
                 name: name || file.name,
                 modifiedById: editor || file.modifiedById,
             },
-            { id }
+            {id}
         );
-        return newFile;
+        const fileData = new FileDto(newFile);
+        return fileData;
     }
 
     // TODO: Удаление с диска продумать
     async removeFile(id) {
-        const file = await this.fileRepo.findOne_('File', { id, deleted: 0 });
+        const file = await this.fileRepo.findOne_('File', {id, deleted: 0});
         if (!file) {
             throw ApiError.internalError('Файл не найден!');
         }
@@ -90,23 +92,25 @@ class FileService {
             throw ApiError.internalError('Файл не найден в репозитории!');
         }
 
-        const paranoid = await this.fileRepo.update_('File', { deleted: 1 }, { id });
+        const paranoid = await this.fileRepo.update_('File', {deleted: 1}, {id});
         const removed = await fse.remove(fullpath);
 
         console.log('removed = ', removed);
-        return { message: 'OK' };
+        return {message: 'OK'};
     }
 
     async getFileInfo(id) {
-        const file = await this.fileRepo.findOne_('File', { id, deleted: 0 }, [
+        const file = await this.fileRepo.findOne_('File', {id, deleted: 0}, [
             'creator',
             'editor',
+            'FileType'
         ]);
         if (!file) {
             throw ApiError.internalError('Файл не найден!');
         }
-        // TODO: убрать из выдачи поля real_
-        return file;
+
+        const fileData = new FileDto(file);
+        return fileData;
     }
 
     async addFileVersion(file) {
@@ -138,12 +142,17 @@ class FileService {
     async getFolderContent(id, offset, limit) {
         const result = await this.fileRepo.findAll_(
             'File',
-            { deleted: 0 },
+            {deleted: 0},
             ['creator', 'editor', 'FileType'],
             offset,
             limit
         );
-        return result;
+
+        const filesData = {
+            ...result,
+            rows: result.rows.map(file => new FileDto(file))
+        };
+        return filesData;
     }
 
     async getFolderInfo(id) {
